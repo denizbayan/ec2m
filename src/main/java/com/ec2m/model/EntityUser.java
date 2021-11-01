@@ -26,8 +26,11 @@ public class EntityUser {
     private Long id;
 
     @NotBlank
-    @Size(max=20)
+    @Size(max=255)
     private String username;
+
+    @Size(max=255)
+    private String usernameBeforeDeleted;
 
     @NotBlank
     private String name;

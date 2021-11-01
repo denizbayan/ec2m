@@ -1,5 +1,6 @@
 package com.ec2m.controller;
 
+import com.ec2m.enums.EnumLoginResult;
 import com.ec2m.enums.EnumSaveUserResult;
 import com.ec2m.model.EntityUser;
 import com.ec2m.payload.LoginPayload;
@@ -13,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.Dictionary;
 import java.util.Optional;
 
 @RestController
@@ -26,22 +27,15 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/getUser/{username}")
-    public EntityUser GetUserByUsername(@PathVariable String username) {
-        System.out.println("what up bitch");
-        Optional<EntityUser> u = userRepository.findByUsernameAndDeleted(username,false);
-        if(u.isPresent()){
+    @PostMapping("/getUser")
+    public EntityUser GetUserByUsername(@Validated @RequestBody String username) {return userService.GetUserByUsername(username);}
 
-            return u.get();
-        }else{
-            System.out.println(username +" yok");
-            return null;
-        }
-    }
-
+    @PostMapping("/deleteUser")
+    public String DeleteUser(@Validated @RequestBody String username) {return userService.DeleteByUsername(username);}
 
     @PostMapping("/signup")
-    public Enum<EnumSaveUserResult> SaveUser(@RequestBody SaveUserPayload req) {
-        return userService.saveUser(req);
-    }
+    public Enum<EnumSaveUserResult> SaveUser(@Validated @RequestBody SaveUserPayload req) {return userService.SaveUser(req);}
+
+    @PostMapping("/login")
+    public Enum<EnumLoginResult> Login(@Validated @RequestBody LoginPayload req) {return userService.Login(req);}
 }

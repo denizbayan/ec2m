@@ -20,14 +20,4 @@ import java.util.Optional;
 
 public class AuthorizationController {
 
-    @Autowired
-    UserService userService;
-
-    @PostMapping("/signin")
-    public EnumLoginResult authenticateUser(@Validated @RequestBody LoginPayload loginRequest) {
-        return userService.login(loginRequest);
-
-    }
-
-
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -17,30 +18,24 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public EnumSaveUserResult saveUser(SaveUserPayload userPayload){
+    public EnumSaveUserResult SaveUser(SaveUserPayload userPayload){
 
-        EntityUser newUser = new EntityUser(userPayload.getUsername(),
-                            userPayload.getName(),userPayload.getLastname(),
-                            userPayload.getPassword(), userPayload.getEmail(),
-                            "", userPayload.getCountry(),
-                            userPayload.getCity(),userPayload.getProfession());
-        System.out.println(userPayload.getUsername()+" "+
-                userPayload.getName()+" "+userPayload.getLastname()+" "+
-                userPayload.getPassword()+" "+ userPayload.getEmail()+" "+
-                "profession"+" "+ userPayload.getCountry()+" "+
-                userPayload.getCity()+" "+userPayload.getProfession());
-
-        newUser.setActive(true);
-        newUser.setDeleted(false);
-        newUser.setStatus(true);
-        userRepository.save(newUser);
-
-        return EnumSaveUserResult.Successful;
+        try{
+            if(userExists(userPayload.getUsername())){
+                return EnumSaveUserResult.UserExists;
+            }else{
+                EntityUser newUser = CreateUser(userPayload);
+                userRepository.save(newUser);
+                return EnumSaveUserResult.Successful;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return EnumSaveUserResult.InvalidData;
+        }
     }
 
-    public EnumLoginResult login(LoginPayload loginPayload){
+    public EnumLoginResult Login(LoginPayload loginPayload){
         Optional<EntityUser> u = userRepository.findByEmailAndDeleted(loginPayload.getEmail(), false);
-
         if(u.isPresent()){
             EntityUser user = u.get();
             if(user.getPassword().equals(loginPayload.getPassword())){
@@ -50,8 +45,58 @@ public class UserService {
             }
         }
         return EnumLoginResult.Failed;
-
     }
 
+    public EntityUser GetUserByUsername(String username){
+        try{
+            Optional<EntityUser> u = userRepository.findByUsernameAndDeleted(username,false);
+            if(u.isPresent()){
+                return u.get();
+            }else{
+                System.out.println(username +" yok");
+                return null;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String DeleteByUsername(String username){
+        try{
+            Optional<EntityUser> u = userRepository.findByUsernameAndDeleted(username,false);
+            if(u.isPresent()){
+                EntityUser user = u.get();
+                user.setDeleted(true);
+                user.setUsernameBeforeDeleted(user.getUsername());
+                user.setUsername(user.getUsername()+ UUID.randomUUID());
+                userRepository.save(user);
+                return "Successful";
+            }else{
+                return "User Does not exist.";
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return "Failed." + e.toString();
+        }
+    }
+
+    /******************************HELPERS******************************/
+    private boolean userExists(String username){
+        Optional<EntityUser> u = userRepository.findByUsernameAndDeleted(username,false);
+        return u.isPresent();
+    }
+
+    private EntityUser CreateUser(SaveUserPayload userPayload){
+        EntityUser u = new EntityUser(userPayload.getUsername(),
+                userPayload.getName(),userPayload.getLastname(),
+                userPayload.getPassword(), userPayload.getEmail(),
+                "", userPayload.getCountry(),
+                userPayload.getCity(),userPayload.getProfession());
+        u.setActive(true);
+        u.setDeleted(false);
+        u.setStatus(true);
+        return u;
+    }
 
 }
