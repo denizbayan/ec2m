@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -52,6 +53,8 @@ public class EntityUser {
 
     private String profession;
 
+    private String bio;
+
     private boolean status;
 
     private boolean deleted;
@@ -59,7 +62,8 @@ public class EntityUser {
     private boolean active;
 
 
-    public EntityUser(String username, String name, String lastname, String password, String email, String profilePicturePath, String country, String city, String profession) {
+
+    public EntityUser(String username, String name, String lastname, String password, String email, String profilePicturePath, String country, String city, String profession, String bio) {
         this.username = username;
         this.name = name;
         this.lastname = lastname;
@@ -69,5 +73,6 @@ public class EntityUser {
         this.country = country;
         this.city = city;
         this.profession = profession;
+        this.bio = bio;
     }
 }

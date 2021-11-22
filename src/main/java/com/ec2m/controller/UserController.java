@@ -2,7 +2,9 @@ package com.ec2m.controller;
 
 import com.ec2m.enums.EnumLoginResult;
 import com.ec2m.enums.EnumSaveUserResult;
+import com.ec2m.enums.EnumUpdateUserResult;
 import com.ec2m.model.EntityUser;
+import com.ec2m.payload.ChangeUserPasswordPayload;
 import com.ec2m.payload.LoginPayload;
 import com.ec2m.payload.SaveUserPayload;
 import com.ec2m.repository.UserRepository;
@@ -38,4 +40,10 @@ public class UserController {
 
     @PostMapping("/login")
     public Enum<EnumLoginResult> Login(@Validated @RequestBody LoginPayload req) {return userService.Login(req);}
+
+    @PostMapping("/updateUser")
+    public Enum<EnumUpdateUserResult> UpdateUser(@Validated @RequestBody SaveUserPayload req){return userService.UpdateUser(req);}
+
+    @PostMapping("/updateUserPassword")
+    public Enum<EnumUpdateUserResult> UpdateUserPassword(@Validated @RequestBody ChangeUserPasswordPayload req){return userService.UpdateUserPassword(req);}
 }
