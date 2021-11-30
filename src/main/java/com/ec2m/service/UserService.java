@@ -15,6 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,10 +27,12 @@ public class UserService {
     UserRepository userRepository;
 
     BCryptPasswordEncoder encoder;
+    SimpleDateFormat dateFormatter;
 
     @EventListener(ApplicationReadyEvent.class)
-    public void defineEncoder() {
+    public void defineUtils() {
         encoder = new BCryptPasswordEncoder();
+        dateFormatter =new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     }
 
     public EnumSaveUserResult SaveUser(SaveUserPayload userPayload){
@@ -38,8 +42,11 @@ public class UserService {
                 return EnumSaveUserResult.UserExists;
             }else{
                 EntityUser newUser = CreateUser(userPayload);
-                userRepository.save(newUser);
-                return EnumSaveUserResult.Successful;
+                if(newUser != null){
+                    userRepository.save(newUser);
+                    return EnumSaveUserResult.Successful;
+                }
+                return EnumSaveUserResult.InvalidData;
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -83,6 +90,8 @@ public class UserService {
                 user.setDeleted(true);
                 user.setUsernameBeforeDeleted(user.getUsername());
                 user.setUsername(user.getUsername()+ UUID.randomUUID());
+                user.setLastModifiedBy(username);
+                user.setLastModifiedDate(new Date());
                 userRepository.save(user);
                 return "Successful";
             }else{
@@ -101,7 +110,7 @@ public class UserService {
                 return EnumUpdateUserResult.UserNotFound;
             }else{
                 EntityUser userToBeUpdated = GetUser(userPayload.getUsername());
-                if(userPayload.getUsername() != null){userToBeUpdated.setUsername(userPayload.getUsername());}
+                if(userPayload.getUsername() != null){userToBeUpdated.setUsername(userPayload.getUsername()); userToBeUpdated.setLastModifiedBy(userPayload.getUsername());}
                 if(userPayload.getEmail() != null){userToBeUpdated.setEmail(userPayload.getEmail());}
                 if(userPayload.getName() != null){userToBeUpdated.setName(userPayload.getName());}
                 if(userPayload.getLastname() != null){userToBeUpdated.setLastname(userPayload.getLastname());}
@@ -109,6 +118,8 @@ public class UserService {
                 if(userPayload.getCity() != null){userToBeUpdated.setCity(userPayload.getCity());}
                 if(userPayload.getProfession() != null){userToBeUpdated.setProfession(userPayload.getProfession());}
                 if(userPayload.getBio() != null){userToBeUpdated.setBio(userPayload.getBio());}
+                if(userPayload.getBirthday() !=null){userToBeUpdated.setBirthday(dateFormatter.parse(userPayload.getBirthday()));}
+                userToBeUpdated.setLastModifiedDate(new Date());
                 userRepository.save(userToBeUpdated);
                 return EnumUpdateUserResult.Successful;
             }
@@ -129,6 +140,8 @@ public class UserService {
                 EntityUser userToBeUpdated = GetUser(username);
                 if(encoder.matches(oldPassword,userToBeUpdated.getPassword())){
                     userToBeUpdated.setPassword(encoder.encode(newPassword));
+                    userToBeUpdated.setLastModifiedBy(username);
+                    userToBeUpdated.setLastModifiedDate(new Date());
                     userRepository.save(userToBeUpdated);
                     return EnumUpdateUserResult.Successful;
                 }else{
@@ -149,17 +162,23 @@ public class UserService {
     }
 
     private EntityUser CreateUser(SaveUserPayload userPayload){
-        String psw = (new BCryptPasswordEncoder().encode(userPayload.getPassword()));
-        EntityUser u = new EntityUser(userPayload.getUsername(),
-                userPayload.getName(),userPayload.getLastname(),
-                psw, userPayload.getEmail(),
-                "", userPayload.getCountry(),
-                userPayload.getCity(),userPayload.getProfession(),
-                userPayload.getBio());
-        u.setActive(true);
-        u.setDeleted(false);
-        u.setStatus(true);
-        return u;
+        try{
+            String psw = (new BCryptPasswordEncoder().encode(userPayload.getPassword()));
+            EntityUser u = new EntityUser(userPayload.getUsername(),
+                    userPayload.getName(),userPayload.getLastname(),
+                    psw, userPayload.getEmail(),
+                    "", userPayload.getCountry(),
+                    userPayload.getCity(),userPayload.getProfession(),
+                    userPayload.getBio(), dateFormatter.parse(userPayload.getBirthday()));
+            u.setActive(true);
+            u.setDeleted(false);
+            u.setStatus(true);
+            return u;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
 }

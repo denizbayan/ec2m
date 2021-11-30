@@ -28,4 +28,6 @@ public interface UserRepository extends JpaRepository<EntityUser,Long> {
     Optional<EntityUser> findByEmailAndDeleted(String email,boolean deleted);
 
     List<EntityUser> findAll();
+
+    Optional<EntityUser> findByIdAndDeleted(Long userId, boolean deleted);
 }

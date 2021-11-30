@@ -6,9 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,10 +15,9 @@ import java.util.Set;
 @Entity
 @Table(name ="users",uniqueConstraints = {
         @UniqueConstraint(columnNames = "username")
-}
-)
+})
 
-public class EntityUser {
+public class EntityUser extends AuditableEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,15 +52,15 @@ public class EntityUser {
 
     private String bio;
 
+    private Date birthday;
+
     private boolean status;
 
     private boolean deleted;
 
     private boolean active;
 
-
-
-    public EntityUser(String username, String name, String lastname, String password, String email, String profilePicturePath, String country, String city, String profession, String bio) {
+    public EntityUser(String username, String name, String lastname, String password, String email, String profilePicturePath, String country, String city, String profession, String bio,Date birthday) {
         this.username = username;
         this.name = name;
         this.lastname = lastname;
@@ -74,5 +71,10 @@ public class EntityUser {
         this.city = city;
         this.profession = profession;
         this.bio = bio;
+        this.birthday = birthday;
+        this.setCreatedDate(new Date());
+        this.setCreatedBy(username);
+        this.setLastModifiedDate(new Date());
+        this.setLastModifiedBy(username);
     }
 }

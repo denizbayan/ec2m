@@ -4,6 +4,8 @@ package com.ec2m.payload;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 public class SaveUserPayload {
@@ -17,5 +19,6 @@ public class SaveUserPayload {
     private String city;
     private String profession;
     private String bio;
+    private String birthday;
 
 }
