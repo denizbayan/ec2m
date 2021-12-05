@@ -3,7 +3,7 @@ package com.ec2m.controller;
 
 
 
-import com.ec2m.enums.EnumLoginResult;
+import com.ec2m.enums.EnumBaseServiceResult;
 import com.ec2m.model.EntityUser;
 import com.ec2m.payload.LoginPayload;
 import com.ec2m.repository.UserRepository;

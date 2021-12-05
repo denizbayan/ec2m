@@ -1,18 +1,15 @@
 package com.ec2m.payload;
 
-import com.ec2m.model.EntityUser;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
+import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetFollowRequestsPayload {
-
+@Getter
+@Setter
+public class MinimalUserPayload {
     public Long userId;
     public String username;
-    public Date sendDate;
-
-
 }

@@ -1,7 +1,7 @@
 package com.ec2m.service;
 
-import com.ec2m.enums.EnumLoginResult;
-import com.ec2m.enums.EnumSaveUserResult;
+import com.ec2m.enums.EnumBaseServiceResult;
+import com.ec2m.enums.EnumBaseServiceResult;
 import com.ec2m.enums.EnumUpdateUserResult;
 import com.ec2m.model.EntityUser;
 import com.ec2m.payload.ChangeUserPasswordPayload;
@@ -35,36 +35,36 @@ public class UserService {
         dateFormatter =new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     }
 
-    public EnumSaveUserResult SaveUser(SaveUserPayload userPayload){
+    public EnumBaseServiceResult SaveUser(SaveUserPayload userPayload){
 
         try{
             if(GetUser(userPayload.getUsername()) != null){
-                return EnumSaveUserResult.UserExists;
+                return EnumBaseServiceResult.Failed;
             }else{
                 EntityUser newUser = CreateUser(userPayload);
                 if(newUser != null){
                     userRepository.save(newUser);
-                    return EnumSaveUserResult.Successful;
+                    return EnumBaseServiceResult.Successful;
                 }
-                return EnumSaveUserResult.InvalidData;
+                return EnumBaseServiceResult.InvalidData;
             }
         }catch(Exception e){
             e.printStackTrace();
-            return EnumSaveUserResult.InvalidData;
+            return EnumBaseServiceResult.InvalidData;
         }
     }
 
-    public EnumLoginResult Login(LoginPayload loginPayload){
+    public EnumBaseServiceResult Login(LoginPayload loginPayload){
         Optional<EntityUser> u = userRepository.findByEmailAndDeleted(loginPayload.getEmail(), false);
         if(u.isPresent()){
             EntityUser user = u.get();
             if(encoder.matches(loginPayload.getPassword(),user.getPassword())){
-                return EnumLoginResult.Successful;
+                return EnumBaseServiceResult.Successful;
             }else{
-                return EnumLoginResult.Failed;
+                return EnumBaseServiceResult.Failed;
             }
         }
-        return EnumLoginResult.Failed;
+        return EnumBaseServiceResult.Failed;
     }
 
     public EntityUser GetUserByUsername(String username){

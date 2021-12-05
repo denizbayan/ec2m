@@ -38,6 +38,8 @@ public class EntityUserRelations extends AuditableEntity{
 
     private boolean deleted;
 
+    private boolean waiting;
+
     public EntityUserRelations(EntityUser follower, EntityUser followed){
         this.followerUser = follower;
         this.followedUser = followed;
@@ -45,6 +47,7 @@ public class EntityUserRelations extends AuditableEntity{
         this.blocked = false;
         this.deleted = false;
         this.closeFriend = false;
+        this.waiting = true;
         this.setCreatedBy(follower.getUsername());
         this.setCreatedDate(new Date());
         this.setLastModifiedBy(follower.getUsername());

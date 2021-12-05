@@ -1,5 +1,5 @@
 package com.ec2m.enums;
 
-public enum EnumAddOrUpdateFollowRequest {
+public enum EnumBaseServiceResult {
     Successful,Failed,InvalidData
 }
